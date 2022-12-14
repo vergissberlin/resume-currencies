@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import {CSS2DRenderer, CSS2DObject} from 'three/addons/renderers/CSS2DRenderer.js'
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
 import {GUI} from 'three/addons/libs/lil-gui.module.min.js'
 import './style.css'
 
@@ -64,11 +65,20 @@ const skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial)
 scene.add(skybox)
 
 // Renderer setup
-const canvas = document.querySelector('#space')
 const renderer = new THREE.WebGLRenderer()
-renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.setPixelRatio(window.devicePixelRatio)
+renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
+
+const labelRenderer = new CSS2DRenderer()
+labelRenderer.setSize(window.innerWidth, window.innerHeight)
+labelRenderer.domElement.style.position = 'absolute'
+labelRenderer.domElement.style.top = '0px'
+document.body.appendChild(labelRenderer.domElement)
+
+const controls = new OrbitControls(camera, labelRenderer.domElement)
+controls.minDistance = 5
+controls.maxDistance = 100
 
 
 // Render loop
@@ -92,64 +102,6 @@ const animate = function () {
 animate()
 
 
-// Change rotation of earth and clouds on mouse drag
-let isDragging = false
-let lastMousePosition = {x: 0, y: 0}
-
-let moveEvent = (e) => {
-    if (isDragging) {
-        const deltaMove = {
-            x: e.offsetX - lastMousePosition.x,
-            y: e.offsetY - lastMousePosition.y
-        }
-
-        earth.rotation.y += deltaMove.x * 0.001
-        earth.rotation.x += deltaMove.y * 0.001
-
-        /// Clouds rotation is the same as the earth
-        clouds.rotation.x = earth.rotation.x
-        clouds.rotation.y = earth.rotation.y
-
-    }
-
-    lastMousePosition = {
-        x: e.offsetX,
-        y: e.offsetY
-    }
-}
-
-window.addEventListener('mousedown', () => {
-    isDragging = true
-})
-window.addEventListener('mouseup', () => {
-    isDragging = false
-})
-window.addEventListener('touchstart', () => {
-    isDragging = true
-})
-window.addEventListener('touchend', () => {
-    isDragging = false
-})
-
-window.addEventListener('mousemove', moveEvent)
-window.addEventListener('touchmove', moveEvent)
-
-// Zoom in/out on mouse wheel
-window.addEventListener('wheel', (e) => {
-    // max zoom in
-    if (camera.position.z < 1.15) {
-        camera.position.z = 1.15
-        return
-    }
-    // max zoom out
-    if (camera.position.z > 12) {
-        camera.position.z = 12
-        return
-    }
-    camera.position.z += e.deltaY * 0.01
-})
-
-
 // Resize listener with improved performance
 let resizeTimer
 window.addEventListener('resize', () => {
@@ -168,12 +120,6 @@ window.addEventListener('mousemove', (e) => {
     light.position.y = -(e.clientY / window.innerHeight * 6 - 3)
 })
 
-
-
-// Change background color to a gradient
-const gradient = new THREE.Color(0x000000)
-gradient.setHSL(0.02, 0.08, 0.08)
-renderer.setClearColor(gradient, 1)
 
 
 /*
@@ -261,14 +207,7 @@ const placeCurrency = async () => {
     }
 }
 
-placeCurrency()
-
-// Add a CSS2DRenderer to the scene
-const css2dRenderer = new CSS2DRenderer()
-css2dRenderer.setSize(window.innerWidth, window.innerHeight)
-css2dRenderer.domElement.style.position = 'absolute'
-css2dRenderer.domElement.style.top = 0
-document.body.appendChild(css2dRenderer.domElement)
+// placeCurrency()
 
 // Render the scene
 const render = () => {

@@ -4,18 +4,19 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
 import {GUI} from 'three/addons/libs/lil-gui.module.min.js'
 import './style.css'
 
-const apiKey = 'MXOPiCmyl3TzlByq7DuKDkRHXW0bletn4VOxFibf'
 const currencyList = 'AUD,CAD,CHF,CNY,EUR,HKD,JPY,MXN,RUB,USD'
+const apiKey = 'MXOPiCmyl3TzlByq7DuKDkRHXW0bletn4VOxFibf'
 let currencyBase = 'AUD'
+let apiUrl = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
 
 
 // If developement mode, use mock data
-if (process.env.NODE_ENV === 'developments')
+if (process.env.NODE_ENV === 'development')
     apiUrl = `${window.location.href}/fixtures/mock.json`
 
 // Get current values of currency from API
 const getCurrency = async () => {
-    const apiUrl = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
+    apiUrl = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
     // Configure the request for json data
     const request = new Request(apiUrl, {
         method: 'GET',
@@ -67,7 +68,8 @@ const updateLabels = (data) => {
         labels[i].style.backgroundColor = '#747bffaa'
     }
     // Change background color from current base currency
-    document.getElementById(currencyBase).style.backgroundColor = 'rgba(255, 144, 140, 0.5)'
+    if (document.getElementById(currencyBase))
+        document.getElementById(currencyBase).style.backgroundColor = 'rgba(255, 144, 140, 0.5)'
 }
 
 // Texture loader
@@ -253,3 +255,7 @@ audioLoader.load('sounds/background-enterprise.mp3', function (buffer) {
     sound.setVolume(0.5)
     sound.play()
 })
+
+
+// Animations
+

@@ -2,6 +2,8 @@
 
 Visualisation of currency exchange rates as prototype with threejs.
 
+![Teaser](./docs/teaser-without.png)
+
 ## Architecture
 
 This project is baseed on Three.js. As data source, the Free Currency API is used. The API is used to get the currency data for the selected date. The data is then used to calculate the position of the countries on the globe. The globe is then rotated to the selected currency.

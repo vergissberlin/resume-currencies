@@ -1,74 +1,48 @@
+# Currency exchange rate visualization
+
+Visualisation of currency exchange rates as prototype with threejs.
+
+## Architecture
+
+This project is baseed on Three.js. As data source, the Free Currency API is used. The API is used to get the currency data for the selected date. The data is then used to calculate the position of the countries on the globe. The globe is then rotated to the selected currency.
+
+```mermaid
+flowchart LR
+    A[Request] <-->| getExchangeRates | B(ReversProxy) <--> | getExchangeRates | C[CurrencyAPI]
+```
+
+## Improvements
+
+This is an prototype of a currency visualization. It is not finished and there are a lot of improvements to be made. If you want to contribute, feel free to open a pull request.
+
+### Add Functionality
+
+This project is not in final state.
+To be useful, the following features need to be added:
+
+* Rotate the earth to selected currency
+* Color countries based on currency value (red = low, green = high) (Heatmap)
+* On click on a label, open a modal with more information about the currency history
+* Add time slider to change the date of the currency data
+* Add a search bar to search for a currency by country name
+* Add a loading animation
+* Add imprint
+
+### Technical improvements
+
+* Varnish Reverse Proxy for the API to hide the API key and to cache the data
+* CORS proxy settings
+* Add unit and e2e tests
+* Add a 404 page
+* Add error handling
+* CI/CD pipeline with github actions
+* Use github pages to host the project
+
 ## Credits
 
-- Textures https://www.solarsystemscope.com/textures/
-- API https://app.freecurrencyapi.com/dashboard
+* Textures <https://www.solarsystemscope.com/textures/>
+* API <https://app.freecurrencyapi.com/dashboard>
 
+## License
 
-```js
-// Place the currency values on the earth, hide labels behind the earth
-const placeCurrency = async () => {
-    // Get the currency data
-    const currency = await getCurrency()
-
-    // Loop through the currency data
-    for (const [key, value] of Object.entries(currency)) {
-
-        // Create a div for the currency
-        const currencyDiv = document.createElement('div')
-        currencyDiv.className = 'label'
-        currencyDiv.textContent = `${key} ${value}`
-
-        // Random number between -1 and 1
-        const random = Math.random() * 2 - 1
-
-        // Create a CSS2DObject for the currency
-        const currencyObject = new CSS2DObject(currencyDiv)
-        currencyObject.position.x = Math.sin(Math.random() * 2 * Math.PI)
-        currencyObject.position.y = Math.random() * 2 - 1
-        currencyObject.position.z = Math.cos(Math.random() * 2 * Math.PI)
-
-        // Add the currency to the scene
-        scene.add(currencyObject)
-    }
-}
-
-
-
-const currencyDivs = {
-    AUD: document.createElement('div'),
-    BGN: document.createElement('div'),
-    BRL: document.createElement('div'),
-    CAD: document.createElement('div'),
-    CHF: document.createElement('div'),
-    CNY: document.createElement('div'),
-    CZK: document.createElement('div'),
-    EUR: document.createElement('div'),
-    GBP: document.createElement('div'),
-    HKD: document.createElement('div'),
-    JPY: document.createElement('div'),
-    MXN: document.createElement('div'),
-    PLN: document.createElement('div'),
-    RUB: document.createElement('div'),
-    USD: document.createElement('div'),
-}
-
-const currencyObjects = {
-    AUD: new CSS2DObject(currencyDivs.AUD),
-    BGN: new CSS2DObject(currencyDivs.BGN),
-    BRL: new CSS2DObject(currencyDivs.BRL),
-    CAD: new CSS2DObject(currencyDivs.CAD),
-    CHF: new CSS2DObject(currencyDivs.CHF),
-    CNY: new CSS2DObject(currencyDivs.CNY),
-    CZK: new CSS2DObject(currencyDivs.CZK),
-    EUR: new CSS2DObject(currencyDivs.EUR),
-    GBP: new CSS2DObject(currencyDivs.GBP),
-    HKD: new CSS2DObject(currencyDivs.HKD),
-    JPY: new CSS2DObject(currencyDivs.JPY),
-    MXN: new CSS2DObject(currencyDivs.MXN),
-    PLN: new CSS2DObject(currencyDivs.PLN),
-    RUB: new CSS2DObject(currencyDivs.RUB),
-    USD: new CSS2DObject(currencyDivs.USD),
-}
-
-
-```
+MIT

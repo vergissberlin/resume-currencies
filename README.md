@@ -26,7 +26,7 @@ To be useful, the following features need to be added:
 
 - [ ] List view of all currencies with their current value under the globe
 - [ ] Rotate the earth to selected currency
-- [ ] Color the countries based on currency value (red = low, green = high) (Heatmap 🟩🟥🟩🟥🟥)
+- [ ] Color the countries based on currency value (🟥 = low,  🟩 = high) (Heatmap)
 - [ ] On click on a label, open a modal with more information about the currency history
 - [ ] Add time slider to change the date of the currency data
 - [ ] Add a search bar to search for a currency by country name

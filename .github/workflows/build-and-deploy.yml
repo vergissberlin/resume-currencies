@@ -2,9 +2,9 @@ name: Build and deploy application
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -14,34 +14,39 @@ permissions:
   contents: read
   pages: write
   id-token: write
-  repository-projects: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
 
 jobs:
-  build:
+  build-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [19.x]
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-    - name: Build application. Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
-    - run: yarn
-    - run: yarn build
-    - name: Deploy to GitHub Pages
-      if: success()
-      uses: crazy-max/ghaction-github-pages@v3
-      with:
-        target_branch: main
-        allow_empty_commit: false
-        build_dir: dist
-        committer: "André Lademann"
-        author: "vergissberlin@googlemail.com"
-        commit_message: "Rebuild application"
-        verbose: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Build application. Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+      - run: yarn
+      - run: yarn build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './dist/'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1

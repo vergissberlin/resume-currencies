@@ -39,6 +39,10 @@ jobs:
           cache: 'yarn'
       - run: yarn
       - run: yarn build
+      - run: |
+          ls -lisah
+          ls -lisah dist
+          pwd
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
       - name: Setup Pages

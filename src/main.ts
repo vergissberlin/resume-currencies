@@ -4,29 +4,39 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import './style.css'
 
-/*
-Class structure
-- import all needed modules
-- declare all variables
-- get current values of currency from API
-- update labels
-- texture loader
-- scene setup
-- camera setup
-- spot light setup
-- ambient light
-
-
-*/
 const
     apiKey = 'MXOPiCmyl3TzlByq7DuKDkRHXW0bletn4VOxFibf',
-    currencyList = 'AUD,CAD,CHF,CNY,EUR,HKD,JPY,MXN,RUB,USD'
+    currencyList = 'AUD,CAD,CHF,CNY,EUR,HKD,JPY,MXN,RUB,USD',
+    textureLoader = new THREE.TextureLoader(),
+    currencyCoordinates = [
+        { code: 'AUD', x: 1, y: 2, z: 4 },
+        { code: 'CAD', x: 1, y: .75, z: -.2 },
+        { code: 'CHF', x: 1, y: .73, z: 1.725 },
+        { code: 'CNY', x: 1, y: 1.1, z: 3.5 },
+        { code: 'EUR', x: 1, y: .79, z: 1.62 },
+        { code: 'HKD', x: 1, y: 1.182, z: 3.58 },
+        { code: 'JPY', x: 1, y: .97, z: 3.9 },
+        { code: 'MXN', x: 1, y: 1.17, z: -.2 },
+        { code: 'RUB', x: 1, y: .58, z: 2.7 },
+        { code: 'USD', x: 1, y: 1, z: -.3 },
+    ]
 
 let
     camera,
+    controls,
+    data,
     scene,
+    sound,
+    spotLight,
     renderer,
+    resizeTimer,
     labelRenderer
+
+let
+    earth,
+    clouds,
+    select,
+    skybox
 
 let
     currencyBase = 'EUR',
@@ -36,8 +46,11 @@ let
 if (process.env.NODE_ENV === 'development')
     apiUrl = `${window.location.href}/fixtures/mock.json`
 
-// Get current values of currency from API
-const getCurrency = async () => {
+/**
+ * Get current values of currency from API
+ * @returns {Promise<JSON>}
+ */
+const getCurrency = async (): Promise<JSON> => {
     apiUrl = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
     // Configure the request for json data
     const request = new Request(apiUrl, {
@@ -54,7 +67,11 @@ const getCurrency = async () => {
     return responseJson.data
 }
 
-const updateLabels = (data) => {
+/**
+ *  Update labels with currency data
+ * @param data JSON object with currency data
+ */
+const updateLabels = (data: JSON): void => {
     data = Object.entries(data)
     data.map((x) => currencyCoordinates.map((y) => {
         if (y.code === x[0]) {
@@ -94,137 +111,121 @@ const updateLabels = (data) => {
         document.getElementById(currencyBase).style.backgroundColor = 'rgba(255, 144, 140, 0.5)'
 }
 
-// Texture loader
-const textureLoader = new THREE.TextureLoader()
-
-// Scene setup
-scene = new THREE.Scene()
-
-// Camera setup
-camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-camera.position.z = 6
-camera.layers.enableAll()
-camera.layers.toggle(1)
-
-// Spot light setup
-const spotLight = new THREE.PointLight(0xffffff, 1.2, 100)
-spotLight.position.set(12, 12, 12)
-scene.add(spotLight)
-
-// Ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, .3)
-scene.add(ambientLight)
-
-// Earth setup
-const earthGeometry = new THREE.SphereGeometry(1, 64, 64)
-const earthTexture = textureLoader.load('images/earth-day.jpg')
-earthTexture.minFilter = THREE.NearestFilter
-earthTexture.magFilter = THREE.NearestFilter
-earthTexture.format = THREE.RGBAFormat
-
-const earthMaterial = new THREE.MeshPhongMaterial({
-    specular: 0x333333,
-    shininess: 15,
-    map: earthTexture,
-    specularMap: textureLoader.load('images/earth-specular.jpg'),
-    normalMap: textureLoader.load('images/earth-normal.png'),
-    normalScale: new THREE.Vector2(2.85, 2.85),
-    bumpMap: textureLoader.load('images/earth-bump.jpg'),
-    bumpScale: 1,
-})
-const earth = new THREE.Mesh(earthGeometry, earthMaterial)
-earth.receiveShadow = true
-scene.add(earth)
-
-labelRenderer = new CSS2DRenderer()
-labelRenderer.setSize(window.innerWidth, window.innerHeight)
-labelRenderer.domElement.style.position = 'absolute'
-labelRenderer.domElement.style.top = '0px'
-document.body.appendChild(labelRenderer.domElement)
-
-// x,y,z coordinates of the currencies on the earth as array
-const currencyCoordinates = [
-    { code: 'AUD', x: 1, y: 2, z: 4 },
-    { code: 'CAD', x: 1, y: .75, z: -.2 },
-    { code: 'CHF', x: 1, y: .73, z: 1.725 },
-    { code: 'CNY', x: 1, y: 1.1, z: 3.5 },
-    { code: 'EUR', x: 1, y: .79, z: 1.62 },
-    { code: 'HKD', x: 1, y: 1.182, z: 3.58 },
-    { code: 'JPY', x: 1, y: .97, z: 3.9 },
-    { code: 'MXN', x: 1, y: 1.17, z: -.2 },
-    { code: 'RUB', x: 1, y: .58, z: 2.7 },
-    { code: 'USD', x: 1, y: 1, z: -.3 },
-]
 
 
-// Get the currency data
-getCurrency().then(data => updateLabels(data))
+/**
+ * Init
+ * @async
+ * @name init
+ * @description Initialize the scene, camera, lights, objects and renderer
+ * @returns {void}
+ */
+const init = (): void => {
+    // Scene setup
+    scene = new THREE.Scene()
 
-// Add clouds to earth
-const cloudTexture = new THREE.TextureLoader().load('images/earth-clouds.jpg')
-const cloudMaterial = new THREE.MeshStandardMaterial({ map: cloudTexture, transparent: true, opacity: 0.5, side: THREE.DoubleSide })
-const cloudGeometry = new THREE.SphereGeometry(1.015, 64, 64)
-const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial)
-clouds.castShadow = true
-scene.add(clouds)
+    // Camera setup
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    camera.position.z = 6
+    camera.layers.enableAll()
+    camera.layers.toggle(1)
 
-// Add background image within a sphere skybox
-const skyboxGeometry = new THREE.SphereGeometry(12, 100, 100)
-const skyboxTexture = new THREE.TextureLoader().load('images/skybox-milkyway.jpg')
-const skyboxMaterial = new THREE.MeshBasicMaterial({ map: skyboxTexture, side: THREE.BackSide })
-const skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial)
-scene.add(skybox)
+    // Spot light setup
+    spotLight = new THREE.PointLight(0xffffff, 1.2, 100)
+    spotLight.position.set(12, 12, 12)
+    scene.add(spotLight)
 
-// Renderer setup
-renderer = new THREE.WebGLRenderer()
-renderer.setPixelRatio(window.devicePixelRatio)
-renderer.setSize(window.innerWidth, window.innerHeight)
-document.body.appendChild(renderer.domElement)
+    // Ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, .3)
+    scene.add(ambientLight)
 
-const controls = new OrbitControls(camera, labelRenderer.domElement)
-controls.minDistance = 1.5
-controls.maxDistance = 15
-controls.enableDamping = true
-controls.autoRotate = true
-controls.autoRotateSpeed = .5
+    // Earth setup
+    const earthGeometry = new THREE.SphereGeometry(1, 64, 64)
+    const earthTexture = textureLoader.load('images/earth-day.jpg')
+    earthTexture.minFilter = THREE.NearestFilter
+    earthTexture.magFilter = THREE.NearestFilter
+    earthTexture.format = THREE.RGBAFormat
+    const earthMaterial = new THREE.MeshPhongMaterial({
+        specular: 0x333333,
+        shininess: 15,
+        map: earthTexture,
+        specularMap: textureLoader.load('images/earth-specular.jpg'),
+        normalMap: textureLoader.load('images/earth-normal.png'),
+        normalScale: new THREE.Vector2(2.85, 2.85),
+        bumpMap: textureLoader.load('images/earth-bump.jpg'),
+        bumpScale: 1,
+    })
+    earth = new THREE.Mesh(earthGeometry, earthMaterial)
+    earth.receiveShadow = true
+    scene.add(earth)
 
+    // Add clouds to earth
+    const cloudTexture = new THREE.TextureLoader().load('images/earth-clouds.jpg')
+    const cloudMaterial = new THREE.MeshStandardMaterial({ map: cloudTexture, transparent: true, opacity: 0.5, side: THREE.DoubleSide })
+    const cloudGeometry = new THREE.SphereGeometry(1.015, 64, 64)
+    clouds = new THREE.Mesh(cloudGeometry, cloudMaterial)
+    clouds.castShadow = true
+    scene.add(clouds)
 
-// Add selection box
-const selection = document.createElement('select')
-selection.className = 'selection'
+    // Add skybox
+    const skyboxGeometry = new THREE.SphereGeometry(12, 100, 100)
+    const skyboxTexture = new THREE.TextureLoader().load('images/skybox-milkyway.jpg')
+    const skyboxMaterial = new THREE.MeshBasicMaterial({ map: skyboxTexture, side: THREE.BackSide })
+    skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial)
+    scene.add(skybox)
 
-// Add options to selection box
-currencyCoordinates.forEach(currency => {
-    const option = document.createElement('option')
-    option.value = currency.code
-    option.textContent = currency.code
-    selection.appendChild(option)
-})
-// Set default option
-selection.value = currencyBase
+    // Add labels
+    labelRenderer = new CSS2DRenderer()
+    labelRenderer.setSize(window.innerWidth, window.innerHeight)
+    labelRenderer.domElement.style.position = 'absolute'
+    labelRenderer.domElement.style.top = '0px'
+    document.body.appendChild(labelRenderer.domElement)
 
-// On change of selection box, change the currencyBase and update the currency rates
-selection.onchange = () => {
-    currencyBase = selection.value
-    getCurrency().then(data => updateLabels(data))
+    // Renderer setup
+    renderer = new THREE.WebGLRenderer()
+    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    document.body.appendChild(renderer.domElement)
+
+    // Orbit controls
+    controls = new OrbitControls(camera, labelRenderer.domElement)
+    controls.minDistance = 1.5
+    controls.maxDistance = 15
+    controls.enableDamping = true
+    controls.autoRotate = true
+    controls.autoRotateSpeed = .5
+
+    // Add background sound to the scene
+    const listener = new THREE.AudioListener()
+    camera.add(listener)
+    sound = new THREE.Audio(listener)
+    const audioLoader = new THREE.AudioLoader()
+    audioLoader.load('sounds/background-enterprise.mp3', function (buffer) {
+        sound.setBuffer(buffer)
+        sound.setLoop(true)
+        sound.setVolume(0.5)
+        sound.play()
+    })
+
+    // Add select box
+    select = document.createElement('select')
+    currencyCoordinates.forEach(currency => {
+        const option = document.createElement('option')
+        option.value = currency.code
+        option.textContent = currency.code
+        select.appendChild(option)
+    })
+    select.value = currencyBase
+    const selectContainer = new CSS2DObject(select)
+    selectContainer.position.set(0, 0, 0)
+    earth.add(selectContainer)
 }
 
-const selectionContainer = new CSS2DObject(selection)
-selectionContainer.position.set(0, 0, 0)
-earth.add(selectionContainer)
-
-// Hide seletion when orbit controls distance is larger than 5
-controls.addEventListener('change', () => {
-    if (controls.getDistance() > 4) {
-        selection.style.opacity = '0'
-    } else {
-        selection.style.opacity = '1'
-    }
-})
-
-
-// Render loop
-const animate = function () {
+/**
+ * Animation
+ * @returns {void}
+ */
+const animate = (): void => {
     requestAnimationFrame(animate)
     controls.update()
 
@@ -243,12 +244,35 @@ const animate = function () {
     labelRenderer.render(scene, camera)
 }
 
-animate()
+/**
+ * Add event listeners
+ * @returns {void}
+ */
+const addEventListeners = (): void => {
+    controls.addEventListener('change', onControlsChange, false)
+    window.addEventListener('resize', onWindowResize, false)
+    select.addEventListener('change', onSelectChange, false)
+    document.addEventListener('mousemove', onMouseMove, false)
+}
 
+/**
+ * On mouse move, update the mouse position
+ * @returns {void}
+ */
+const onControlsChange = (): void => {
+    // Hide seletion when orbit controls distance is larger than 5
+    if (controls.getDistance() > 4) {
+        select.style.opacity = '0'
+    } else {
+        select.style.opacity = '1'
+    }
+}
 
-// Resize listener with improved performance
-let resizeTimer
-window.addEventListener('resize', () => {
+/**
+ * On window resize, update the camera and renderer
+ * @returns {void}
+ */
+const onWindowResize = (): void => {
     clearTimeout(resizeTimer)
     resizeTimer = setTimeout(() => {
         camera.aspect = window.innerWidth / window.innerHeight
@@ -256,30 +280,49 @@ window.addEventListener('resize', () => {
         renderer.setSize(window.innerWidth, window.innerHeight)
         labelRenderer.setSize(window.innerWidth, window.innerHeight)
     }, 250)
-})
+}
 
-// Rotate the light arround the earth on mouse move
-window.addEventListener('mousemove', (e) => {
+
+/**
+ * On change of select box, change the currencyBase and update the currency rates
+ * @returns {void}
+ */
+const onSelectChange = (): void => {
+    currencyBase = select.value
+    getCurrency().then(data => updateLabels(data))
+    render()
+}
+/**
+ *  On change of select box, change the currencyBase and update the currency rates
+ * @param e Event
+ * @returns {void}
+ */
+const onMouseMove = (e: MouseEvent): void => {
+    e.preventDefault()
+    // Rotate the light arround the earth on mouse move
     spotLight.position.x = Math.sin(e.clientX / window.innerWidth * 2 * Math.PI) * -3
     spotLight.position.z = Math.cos(e.clientX / window.innerWidth * 2 * Math.PI) * -3
     spotLight.position.y = -(e.clientY / window.innerHeight * 6 - 3)
-})
+}
 
-// Add background sound to the scene
-const listener = new THREE.AudioListener()
-camera.add(listener)
-const sound = new THREE.Audio(listener)
-const audioLoader = new THREE.AudioLoader()
-audioLoader.load('sounds/background-enterprise.mp3', function (buffer) {
-    sound.setBuffer(buffer)
-    sound.setLoop(true)
-    sound.setVolume(0.5)
-    sound.play()
-})
+/**
+ * Render the scene
+ * @returns {void}
+ */
+const render = async (): Promise<void> => {
+    // Get data from API
+    data = await getCurrency()
 
+    // Update labels
+    updateLabels(data)
+}
 
-// Animations
-const elementTitle = document.getElementById('title')
+init()
+animate()
+addEventListeners()
+render()
+
+// Animation timeline
 const timeline = gsap.timeline({ defaults: { duration: 1.44, ease: 'power2.inOut' } })
 timeline.fromTo(camera.position, { x: 0, y: 0, z: 20 }, { x: 0, y: 0, z: 1.8 })
 timeline.fromTo("#title", { y: -100, opacity: 0 }, { y: 0, opacity: 1 })

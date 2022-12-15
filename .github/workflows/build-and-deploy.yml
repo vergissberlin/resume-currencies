@@ -17,13 +17,10 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [19.x]
-
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -33,8 +30,9 @@ jobs:
         cache: 'yarn'
     - run: yarn
     - run: yarn build
-    - name: GitHub Pages
-      uses: crazy-max/ghaction-github-pages@v3.1.0
+    - name: Deploy to GitHub Pages
+      if: success()
+      uses: crazy-max/ghaction-github-pages@v3
       with:
         target_branch: main
         allow_empty_commit: false
@@ -43,3 +41,5 @@ jobs:
         author: "vergissberlin@googlemail.com"
         commit_message: "Rebuild application"
         verbose: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

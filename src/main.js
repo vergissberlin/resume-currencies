@@ -1,18 +1,29 @@
 import * as THREE from 'three'
+import gsap from 'gsap'
+
 import {CSS2DRenderer, CSS2DObject} from 'three/addons/renderers/CSS2DRenderer.js'
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
-import {GUI} from 'three/addons/libs/lil-gui.module.min.js'
+
 import './style.css'
 
-const currencyList = 'AUD,CAD,CHF,CNY,EUR,HKD,JPY,MXN,RUB,USD'
-const apiKey = 'MXOPiCmyl3TzlByq7DuKDkRHXW0bletn4VOxFibf'
-let currencyBase = 'AUD'
-let apiUrl = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
+const
+    apiKey = 'MXOPiCmyl3TzlByq7DuKDkRHXW0bletn4VOxFibf',
+    currencyList = 'AUD,CAD,CHF,CNY,EUR,HKD,JPY,MXN,RUB,USD'
 
+let
+    camera,
+    scene,
+    renderer,
+    labelRenderer
+
+let
+    currencyBase = 'AUD',
+    apiUrl = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
 
 // If developement mode, use mock data
 if (process.env.NODE_ENV === 'development')
     apiUrl = `${window.location.href}/fixtures/mock.json`
+
 
 // Get current values of currency from API
 const getCurrency = async () => {
@@ -38,7 +49,6 @@ const updateLabels = (data) => {
         if (y.code === x[0]) {
             x.coords = {x: y.x, y: y.y, z: y.z}
             return x
-        } else {
         }
     }))
 
@@ -76,10 +86,10 @@ const updateLabels = (data) => {
 const textureLoader = new THREE.TextureLoader()
 
 // Scene setup
-const scene = new THREE.Scene()
+scene = new THREE.Scene()
 
 // Camera setup
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
 camera.position.z = 6
 camera.layers.enableAll()
 camera.layers.toggle(1)
@@ -114,7 +124,7 @@ const earth = new THREE.Mesh(earthGeometry, earthMaterial)
 earth.receiveShadow = true
 scene.add(earth)
 
-const labelRenderer = new CSS2DRenderer()
+labelRenderer = new CSS2DRenderer()
 labelRenderer.setSize(window.innerWidth, window.innerHeight)
 labelRenderer.domElement.style.position = 'absolute'
 labelRenderer.domElement.style.top = '0px'
@@ -134,10 +144,6 @@ const currencyCoordinates = [
     {code: 'USD', x: 1, y: 1, z: -.3},
 ]
 
-// Add helper to show the x,y,z coordinates of the currencies
-const helper = new THREE.AxesHelper(1)
-helper.position.set(0, 0, 0)
-earth.add(helper)
 
 // Get the currency data
 getCurrency().then(data => updateLabels(data))
@@ -158,7 +164,7 @@ const skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial)
 scene.add(skybox)
 
 // Renderer setup
-const renderer = new THREE.WebGLRenderer()
+renderer = new THREE.WebGLRenderer()
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
@@ -258,4 +264,7 @@ audioLoader.load('sounds/background-enterprise.mp3', function (buffer) {
 
 
 // Animations
-
+const elementTitle = document.getElementById('title')
+const timeline = gsap.timeline({defaults: {duration: 1.44, ease: 'power2.inOut'}})
+timeline.fromTo(camera.position, {x: 0, y: 0, z: 20}, {x: 0, y: 0, z: 1.8})
+timeline.fromTo("#title", {y: -100, opacity: 0}, {y: 0, opacity: 1})

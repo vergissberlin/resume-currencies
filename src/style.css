@@ -43,8 +43,9 @@ h1, h2, h3 {
     position: absolute;
     top: 4vh;
     left: 50%;
-    text-shadow: 0 0 .6em #646cff;
+    text-shadow: 0 0 5px #FFF, 0 0 10px #FFF, 0 0 15px #FFF, 0 0 20px #515ad4, 0 0 30px #4998ff, 0 0 40px #2018ff, 0 0 55px #1837ff, 0 0 75px #2418ff;
     transform: translateX(-50%);
+    z-index: 144;
 }
 
 .label {

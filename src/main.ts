@@ -1,11 +1,23 @@
 import * as THREE from 'three'
 import gsap from 'gsap'
-
-import {CSS2DRenderer, CSS2DObject} from 'three/addons/renderers/CSS2DRenderer.js'
-import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
-
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import './style.css'
 
+/*
+Class structure
+- import all needed modules
+- declare all variables
+- get current values of currency from API
+- update labels
+- texture loader
+- scene setup
+- camera setup
+- spot light setup
+- ambient light
+
+
+*/
 const
     apiKey = 'MXOPiCmyl3TzlByq7DuKDkRHXW0bletn4VOxFibf',
     currencyList = 'AUD,CAD,CHF,CNY,EUR,HKD,JPY,MXN,RUB,USD'
@@ -17,13 +29,12 @@ let
     labelRenderer
 
 let
-    currencyBase = 'AUD',
+    currencyBase = 'EUR',
     apiUrl = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
 
 // If developement mode, use mock data
 if (process.env.NODE_ENV === 'development')
     apiUrl = `${window.location.href}/fixtures/mock.json`
-
 
 // Get current values of currency from API
 const getCurrency = async () => {
@@ -47,7 +58,7 @@ const updateLabels = (data) => {
     data = Object.entries(data)
     data.map((x) => currencyCoordinates.map((y) => {
         if (y.code === x[0]) {
-            x.coords = {x: y.x, y: y.y, z: y.z}
+            x.coords = { x: y.x, y: y.y, z: y.z }
             return x
         }
     }))
@@ -77,6 +88,7 @@ const updateLabels = (data) => {
     for (let i = 0; i < labels.length; i++) {
         labels[i].style.backgroundColor = '#747bffaa'
     }
+
     // Change background color from current base currency
     if (document.getElementById(currencyBase))
         document.getElementById(currencyBase).style.backgroundColor = 'rgba(255, 144, 140, 0.5)'
@@ -132,16 +144,16 @@ document.body.appendChild(labelRenderer.domElement)
 
 // x,y,z coordinates of the currencies on the earth as array
 const currencyCoordinates = [
-    {code: 'AUD', x: 1, y: 2, z: 4},
-    {code: 'CAD', x: 1, y: .75, z: -.2},
-    {code: 'CHF', x: 1, y: .73, z: 1.725},
-    {code: 'CNY', x: 1, y: 1.1, z: 3.5},
-    {code: 'EUR', x: 1, y: .79, z: 1.62},
-    {code: 'HKD', x: 1, y: 1.182, z: 3.58},
-    {code: 'JPY', x: 1, y: .97, z: 3.9},
-    {code: 'MXN', x: 1, y: 1.17, z: -.2},
-    {code: 'RUB', x: 1, y: .58, z: 2.7},
-    {code: 'USD', x: 1, y: 1, z: -.3},
+    { code: 'AUD', x: 1, y: 2, z: 4 },
+    { code: 'CAD', x: 1, y: .75, z: -.2 },
+    { code: 'CHF', x: 1, y: .73, z: 1.725 },
+    { code: 'CNY', x: 1, y: 1.1, z: 3.5 },
+    { code: 'EUR', x: 1, y: .79, z: 1.62 },
+    { code: 'HKD', x: 1, y: 1.182, z: 3.58 },
+    { code: 'JPY', x: 1, y: .97, z: 3.9 },
+    { code: 'MXN', x: 1, y: 1.17, z: -.2 },
+    { code: 'RUB', x: 1, y: .58, z: 2.7 },
+    { code: 'USD', x: 1, y: 1, z: -.3 },
 ]
 
 
@@ -150,7 +162,7 @@ getCurrency().then(data => updateLabels(data))
 
 // Add clouds to earth
 const cloudTexture = new THREE.TextureLoader().load('images/earth-clouds.jpg')
-const cloudMaterial = new THREE.MeshStandardMaterial({map: cloudTexture, transparent: true, opacity: 0.5, side: THREE.DoubleSide})
+const cloudMaterial = new THREE.MeshStandardMaterial({ map: cloudTexture, transparent: true, opacity: 0.5, side: THREE.DoubleSide })
 const cloudGeometry = new THREE.SphereGeometry(1.015, 64, 64)
 const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial)
 clouds.castShadow = true
@@ -159,7 +171,7 @@ scene.add(clouds)
 // Add background image within a sphere skybox
 const skyboxGeometry = new THREE.SphereGeometry(12, 100, 100)
 const skyboxTexture = new THREE.TextureLoader().load('images/skybox-milkyway.jpg')
-const skyboxMaterial = new THREE.MeshBasicMaterial({map: skyboxTexture, side: THREE.BackSide})
+const skyboxMaterial = new THREE.MeshBasicMaterial({ map: skyboxTexture, side: THREE.BackSide })
 const skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial)
 scene.add(skybox)
 
@@ -176,17 +188,10 @@ controls.enableDamping = true
 controls.autoRotate = true
 controls.autoRotateSpeed = .5
 
-// Hide seletion when orbit controls distance is larger than 5
-controls.addEventListener('change', () => {
-    if (controls.getDistance() > 4) {
-        selection.style.opacity = 0
-    } else {
-        selection.style.opacity = 1
-    }
-})
 
 // Add selection box
 const selection = document.createElement('select')
+selection.className = 'selection'
 
 // Add options to selection box
 currencyCoordinates.forEach(currency => {
@@ -195,7 +200,8 @@ currencyCoordinates.forEach(currency => {
     option.textContent = currency.code
     selection.appendChild(option)
 })
-selection.className = 'selection'
+// Set default option
+selection.value = currencyBase
 
 // On change of selection box, change the currencyBase and update the currency rates
 selection.onchange = () => {
@@ -203,10 +209,19 @@ selection.onchange = () => {
     getCurrency().then(data => updateLabels(data))
 }
 
-
 const selectionContainer = new CSS2DObject(selection)
 selectionContainer.position.set(0, 0, 0)
 earth.add(selectionContainer)
+
+// Hide seletion when orbit controls distance is larger than 5
+controls.addEventListener('change', () => {
+    if (controls.getDistance() > 4) {
+        selection.style.opacity = '0'
+    } else {
+        selection.style.opacity = '1'
+    }
+})
+
 
 // Render loop
 const animate = function () {
@@ -265,6 +280,6 @@ audioLoader.load('sounds/background-enterprise.mp3', function (buffer) {
 
 // Animations
 const elementTitle = document.getElementById('title')
-const timeline = gsap.timeline({defaults: {duration: 1.44, ease: 'power2.inOut'}})
-timeline.fromTo(camera.position, {x: 0, y: 0, z: 20}, {x: 0, y: 0, z: 1.8})
-timeline.fromTo("#title", {y: -100, opacity: 0}, {y: 0, opacity: 1})
+const timeline = gsap.timeline({ defaults: { duration: 1.44, ease: 'power2.inOut' } })
+timeline.fromTo(camera.position, { x: 0, y: 0, z: 20 }, { x: 0, y: 0, z: 1.8 })
+timeline.fromTo("#title", { y: -100, opacity: 0 }, { y: 0, opacity: 1 })

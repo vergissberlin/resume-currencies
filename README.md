@@ -1,5 +1,7 @@
 # Currency exchange rate visualization
 
+[![Build and deploy application](https://github.com/vergissberlin/resume-currencies/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/vergissberlin/resume-currencies/actions/workflows/build-and-deploy.yml)
+
 Visualisation of currency exchange rates as prototype with threejs.
 
 ![Teaser](./docs/teaser-without.png)

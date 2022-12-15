@@ -58,8 +58,7 @@ h1, h2, h3 {
     line-height: 1em;
     border-radius: .2em;
     opacity: .8;
-    transition: opacity 0.25s, background-color 0.25s;
-
+    transition: opacity 0.25s, background-color 0.25s, font-size 0.05s ease-out;
 }
 
 .label:hover {
@@ -85,6 +84,7 @@ select {
     appearance: none;
     background-color: #535bf266;
     border: blueviolet 1px solid;
+    border-radius: 0.25em;
     padding: .7em .5em;
     margin: 0;
     font-family: inherit;
@@ -93,6 +93,8 @@ select {
     line-height: inherit;
     z-index: 1;
     outline: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
 }
 
 select::-ms-expand {
@@ -101,14 +103,6 @@ select::-ms-expand {
 
 .select option {
     padding: 1em;
-}
-
-h2.title {
-    top: 8vh;
-}
-
-h3.title {
-    top: 12vh;
 }
 
 /* Animate width of canvas */

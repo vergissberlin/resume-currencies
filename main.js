@@ -13,7 +13,6 @@ let currencyBase = 'AUD'
 if (process.env.NODE_ENV === 'developments')
     apiUrl = `${window.location.href}/fixtures/mock.json`
 
-
 // Get current values of currency from API
 const getCurrency = async () => {
     const apiUrl = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
@@ -24,10 +23,9 @@ const getCurrency = async () => {
             'Content-Type': 'application/json'
         })
     })
-    console.log(apiUrl)
+
     // Convert the response to json
     const responseJson = await (await fetch(request)).json()
-    console.log(responseJson.data)
 
     // Return the data
     return responseJson.data
@@ -70,7 +68,6 @@ const updateLabels = (data) => {
     }
     // Change background color from current base currency
     document.getElementById(currencyBase).style.backgroundColor = 'rgba(255, 144, 140, 0.5)'
-
 }
 
 // Texture loader
@@ -169,6 +166,14 @@ controls.minDistance = 1.5
 controls.maxDistance = 15
 controls.enableDamping = true
 
+// Hide seletion when orbit controls distance is larger than 5
+controls.addEventListener('change', () => {
+    if (controls.getDistance() > 4) {
+        selection.style.opacity = 0
+    } else {
+        selection.style.opacity = 1
+    }
+})
 
 // Add selection box
 const selection = document.createElement('select')
@@ -190,9 +195,8 @@ selection.onchange = () => {
 
 
 const selectionContainer = new CSS2DObject(selection)
-selectionContainer.position.set(1.44, -1, 0)
+selectionContainer.position.set(0, 0, 0)
 earth.add(selectionContainer)
-
 
 // Render loop
 const animate = function () {
@@ -224,6 +228,7 @@ window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight
         camera.updateProjectionMatrix()
         renderer.setSize(window.innerWidth, window.innerHeight)
+        labelRenderer.setSize(window.innerWidth, window.innerHeight)
     }, 250)
 })
 

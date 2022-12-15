@@ -35,17 +35,28 @@ To be useful, the following features need to be added:
 
 ### Technical improvements
 
-* Varnish Reverse Proxy for the API to hide the API key and to cache the data
-* CORS proxy settings
-* Add unit and e2e tests
-* Add a 404 page
-* Add error handling
-* CI/CD pipeline with github actions
-* Use github pages to host the project
-* Add a linter
-* Add a formatter
-* Add a commit message linter
-* Reduce the size of the textures
+- [ ] Capsulate logic in classes
+- [ ] Add types
+- [ ] CORS proxy settings
+- [ ] Add unit and e2e tests
+- [ ]  Add a 404 page
+- [ ]  Add error handling
+- [x]  CI/CD pipeline with github actions
+- [ ]  Use github pages to host the project
+- [ ] Add a linter
+- [ ] Add a formatter
+- [ ] Add a commit message linter
+- [x] Reduce the size of the textures
+- [ ] Varnish Reverse Proxy for the API to hide the API key and to cache the data
+
+## Development
+
+### Setup and run
+
+```bash
+yarn
+yarn dev
+```
 
 ## Credits
 

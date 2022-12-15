@@ -165,6 +165,8 @@ const controls = new OrbitControls(camera, labelRenderer.domElement)
 controls.minDistance = 1.5
 controls.maxDistance = 15
 controls.enableDamping = true
+controls.autoRotate = true
+controls.autoRotateSpeed = .5
 
 // Hide seletion when orbit controls distance is larger than 5
 controls.addEventListener('change', () => {
@@ -201,6 +203,7 @@ earth.add(selectionContainer)
 // Render loop
 const animate = function () {
     requestAnimationFrame(animate)
+    controls.update()
 
     earth.rotation.x += 0.00005
     earth.rotation.y += 0.0005

@@ -8,7 +8,7 @@ This project is baseed on Three.js. As data source, the Free Currency API is use
 
 ```mermaid
 flowchart LR
-    A[Request] <-->| getExchangeRates | B(ReversProxy) <--> | getExchangeRates | C[CurrencyAPI]
+    A[User] <-->| getExchangeRates | B(ReversProxy) <--> | getExchangeRates | C[CurrencyAPI]
 ```
 
 ## Improvements
@@ -20,6 +20,7 @@ This is an prototype of a currency visualization. It is not finished and there a
 This project is not in final state.
 To be useful, the following features need to be added:
 
+* List view of all currencies with their current value under the globe
 * Rotate the earth to selected currency
 * Color countries based on currency value (red = low, green = high) (Heatmap)
 * On click on a label, open a modal with more information about the currency history
@@ -37,6 +38,10 @@ To be useful, the following features need to be added:
 * Add error handling
 * CI/CD pipeline with github actions
 * Use github pages to host the project
+* Add a linter
+* Add a formatter
+* Add a commit message linter
+* Reduce the size of the textures
 
 ## Credits
 

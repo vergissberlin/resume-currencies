@@ -288,6 +288,7 @@ const init = (): void => {
     input.min = 1
     input.max = 10000
     input.step = 1
+    input.pattern = '[0-9]*'
     input.className = 'factor'
     input.onchange = () => onFactorChange(input.value)
     formDiv.appendChild(input)

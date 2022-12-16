@@ -35,6 +35,7 @@ To be useful, the following features need to be added:
 - [ ] Add a loading indicator for  currency data
 - [ ] Add imprint
 - [x] Add a favicon
+- [ ] Localize the app with i18n (currency names, country numbers, etc.)
 
 ### Technical improvements
 

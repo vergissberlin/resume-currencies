@@ -22,18 +22,23 @@ const
     apiKey = 'MXOPiCmyl3TzlByq7DuKDkRHXW0bletn4VOxFibf',
     currencyList = 'AUD,CAD,CHF,CNY,EUR,HKD,JPY,MXN,RUB,USD',
     textureLoader = new THREE.TextureLoader(),
-    currencyCoordinates = [
-        { code: 'AUD', x: 1, y: 2, z: 4 },
-        { code: 'CAD', x: 1, y: .75, z: -.2 },
-        { code: 'CHF', x: 1, y: .73, z: 1.725 },
-        { code: 'CNY', x: 1, y: 1.1, z: 3.5 },
-        { code: 'EUR', x: 1, y: .79, z: 1.62 },
-        { code: 'HKD', x: 1, y: 1.182, z: 3.58 },
-        { code: 'JPY', x: 1, y: .97, z: 3.9 },
-        { code: 'MXN', x: 1, y: 1.17, z: -.2 },
-        { code: 'RUB', x: 1, y: .58, z: 2.7 },
-        { code: 'USD', x: 1, y: 1, z: -.3 },
-    ]
+    currencyCoordinates: {
+        code: string,
+        x: number,
+        y: number,
+        z: number,
+    }[] = [
+            { code: 'AUD', x: 1, y: 2, z: 4 },
+            { code: 'CAD', x: 1, y: .75, z: -.2 },
+            { code: 'CHF', x: 1, y: .73, z: 1.725 },
+            { code: 'CNY', x: 1, y: 1.1, z: 3.5 },
+            { code: 'EUR', x: 1, y: .79, z: 1.62 },
+            { code: 'HKD', x: 1, y: 1.182, z: 3.58 },
+            { code: 'JPY', x: 1, y: .97, z: 3.9 },
+            { code: 'MXN', x: 1, y: 1.17, z: -.2 },
+            { code: 'RUB', x: 1, y: .58, z: 2.7 },
+            { code: 'USD', x: 1, y: 1, z: -.3 },
+        ]
 let
     factor: number = 1
 
@@ -57,7 +62,7 @@ let
     skybox: THREE.Mesh
 
 let
-    textures = {
+    textures: Textures = {
         earth: {
             map: 'images/earth-day-8k.jpg',
             normal: 'images/earth-normal-2k.png',
@@ -87,8 +92,8 @@ if (window.matchMedia('(pointer: coarse)').matches) {
 }
 
 let
-    currencyBase = 'EUR',
-    apiUrl = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
+    currencyBase: String = 'EUR',
+    apiUrl: String = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
 
 // If developement mode, use mock data
 if (process.env.NODE_ENV === 'development')
@@ -119,7 +124,7 @@ const getCurrency = async (): Promise<JSON> => {
  *  Update labels with currency data
  * @param data JSON object with currency data
  */
-const updateLabels = (data: JSON): void => {
+const updateLabels = (data: [string, any][]): void => {
     data = Object.entries(data)
     data.map((x) => currencyCoordinates.map((y) => {
         if (y.code === x[0]) {
@@ -132,7 +137,7 @@ const updateLabels = (data: JSON): void => {
     data.forEach(currency => {
         // Check if label with id  currency[0] exits
         const label = document.getElementById(currency[0])
-        const value:number = currency[1] * factor
+        const value: number = currency[1] * factor
         if (label) {
             label.innerHTML = `${currency[0]}: ${value.toFixed(2)}`
         } else {

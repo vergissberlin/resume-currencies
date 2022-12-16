@@ -37,7 +37,6 @@ body {
 
 body::before {
     display: none;
-    ;
 }
 
 h1, h2, h3 {
@@ -88,6 +87,7 @@ h1, h2, h3 {
     background: #ffffff55;
     border: 1px solid #aaa;
     border-radius: 0 .25em .25em 0;
+    height: 60px;
 }
 
 .factor:focus {
@@ -95,28 +95,29 @@ h1, h2, h3 {
     background: #ffffffaa;
 }
 
-select {
+.select {
     appearance: none;
+    padding: .4em;
+    margin: 0;
     background-color: #535bf266;
     border: blueviolet 1px solid;
     border-radius: 0.25em 0 0 0.25em;
     border-right: 0;
-    padding: .7em .5em;
-    margin: 0;
     font-family: inherit;
-    font-size: inherit;
+    font-size: 1em;
+    height: 60px;
     cursor: inherit;
     line-height: inherit;
-    z-index: 1;
     outline: none;
     transition: opacity 0.5s ease-in-out;
+    z-index: 1;
 }
 
-select::-ms-expand {
+.select::-ms-expand {
     display: none;
 }
 
-select option {
+.select option {
     padding: 1em;
 }
 
@@ -130,5 +131,9 @@ canvas {
 @media only screen and (max-width: 600px) {
     body {
         font-size: 100%;
+    }
+
+    .select, .factor {
+        height: 50px;
     }
 }

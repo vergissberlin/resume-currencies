@@ -279,6 +279,7 @@ const init = (): void => {
         select.appendChild(option)
     })
     select.value = currencyBase
+    select.className = 'select'
     formDiv.appendChild(select)
 
     // Add input field to change base currency factor

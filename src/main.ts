@@ -3,6 +3,20 @@ import gsap from 'gsap'
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import './style.css'
+import { type } from 'os'
+
+type Textures = {
+    earth: {
+        map: string,
+        normal: string,
+        specular: string,
+        bump: string,
+        clouds: string,
+    },
+    skybox: {
+        normal: string,
+    },
+}
 
 const
     apiKey = 'MXOPiCmyl3TzlByq7DuKDkRHXW0bletn4VOxFibf',
@@ -20,23 +34,27 @@ const
         { code: 'RUB', x: 1, y: .58, z: 2.7 },
         { code: 'USD', x: 1, y: 1, z: -.3 },
     ]
+let
+    factor: number = 1
 
 let
-    camera,
-    controls,
-    data,
-    scene,
-    sound,
-    spotLight,
-    renderer,
-    resizeTimer,
-    labelRenderer
+    camera: THREE.PerspectiveCamera,
+    controls: OrbitControls,
+    data: JSON,
+    scene: THREE.Scene,
+    sound: THREE.Audio,
+    spotLight: THREE.SpotLight,
+    renderer: THREE.WebGLRenderer,
+    resizeTimer: number,
+    labelRenderer: CSS2DRenderer
 
 let
-    earth,
-    clouds,
-    select,
-    skybox
+    earth: THREE.Mesh,
+    clouds: THREE.Mesh,
+    form: THREE.Mesh,
+    formDiv: HTMLDivElement,
+    select: THREE.Mesh,
+    skybox: THREE.Mesh
 
 let
     textures = {
@@ -114,13 +132,14 @@ const updateLabels = (data: JSON): void => {
     data.forEach(currency => {
         // Check if label with id  currency[0] exits
         const label = document.getElementById(currency[0])
+        const value:number = currency[1] * factor
         if (label) {
-            label.innerHTML = `${currency[0]}: ${currency[1].toFixed(2)}`
+            label.innerHTML = `${currency[0]}: ${value.toFixed(2)}`
         } else {
             const currencyDiv = document.createElement('div')
             currencyDiv.className = 'label'
             currencyDiv.id = currency[0]
-            currencyDiv.textContent = `${currency[0]} ${currency[1].toFixed(2)}`
+            currencyDiv.textContent = `${currency[0]} ${value.toFixed(2)}`
             currencyDiv.style.marginTop = '-.1em'
             const currencyLabel = new CSS2DObject(currencyDiv)
             let point = new THREE.Vector3().setFromSphericalCoords(currency.coords.x, currency.coords.y, currency.coords.z)
@@ -239,7 +258,14 @@ const init = (): void => {
         sound.play()
     })
 
-    // Add select box
+    // Add formular to change base currency
+    formDiv = document.createElement('div')
+    formDiv.className = 'form'
+    form = new CSS2DObject(formDiv)
+    form.position.set(0, 0, 0)
+    earth.add(form)
+
+    // Add user input to change base currency
     select = document.createElement('select')
     currencyCoordinates.forEach(currency => {
         const option = document.createElement('option')
@@ -248,9 +274,19 @@ const init = (): void => {
         select.appendChild(option)
     })
     select.value = currencyBase
-    const selectContainer = new CSS2DObject(select)
-    selectContainer.position.set(0, 0, 0)
-    earth.add(selectContainer)
+    formDiv.appendChild(select)
+
+    // Add input field to change base currency factor
+    const input = document.createElement('input')
+    input.type = 'number'
+    input.value = 1
+    input.min = 1
+    input.max = 10000
+    input.step = 1
+    input.className = 'factor'
+    input.onchange = () => onFactorChange(input.value)
+    formDiv.appendChild(input)
+
 }
 
 /**
@@ -294,9 +330,9 @@ const addEventListeners = (): void => {
 const onControlsChange = (): void => {
     // Hide seletion when orbit controls distance is larger than 5
     if (controls.getDistance() > 4) {
-        select.style.opacity = '0'
+        formDiv.style.opacity = '0'
     } else {
-        select.style.opacity = '1'
+        formDiv.style.opacity = '1'
     }
 }
 
@@ -314,7 +350,6 @@ const onWindowResize = (): void => {
     }, 250)
 }
 
-
 /**
  * On change of select box, change the currencyBase and update the currency rates
  * @returns {void}
@@ -324,6 +359,13 @@ const onSelectChange = (): void => {
     getCurrency().then(data => updateLabels(data))
     render()
 }
+
+const onFactorChange = (value): void => {
+    factor = parseFloat(value)
+    getCurrency().then(data => updateLabels(data))
+    render()
+}
+
 /**
  *  On change of select box, change the currencyBase and update the currency rates
  * @param e Event

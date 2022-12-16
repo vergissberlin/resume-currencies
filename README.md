@@ -24,6 +24,7 @@ This is an prototype of a currency visualization. It is not finished and there a
 This project is not in final state.
 To be useful, the following features need to be added:
 
+- [x] Add input field for base value
 - [ ] List view of all currencies with their current value under the globe
 - [ ] Rotate the earth to selected currency
 - [ ] Color the countries based on currency value (🟥 = low,  🟩 = high) (Heatmap)
@@ -33,6 +34,7 @@ To be useful, the following features need to be added:
 - [x] Add a loading screen
 - [ ] Add a loading indicator for  currency data
 - [ ] Add imprint
+- [x] Add a favicon
 
 ### Technical improvements
 

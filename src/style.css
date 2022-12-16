@@ -36,7 +36,8 @@ body {
 }
 
 body::before {
-    display: none;;
+    display: none;
+    ;
 }
 
 h1, h2, h3 {
@@ -71,11 +72,35 @@ h1, h2, h3 {
     font-size: larger;
 }
 
+.form {
+    display: flex;
+    width: 20vh;
+    height: 10vh;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.25s;
+}
+
+.factor {
+    padding: .4em .1em .4em .86em;
+    font-size: 1.2em;
+    text-align: right;
+    background: #ffffff55;
+    border: 1px solid #aaa;
+    border-radius: 0 .25em .25em 0;
+}
+
+.factor:focus {
+    outline: none;
+    background: #ffffffaa;
+}
+
 select {
     appearance: none;
     background-color: #535bf266;
     border: blueviolet 1px solid;
-    border-radius: 0.25em;
+    border-radius: 0.25em 0 0 0.25em;
+    border-right: 0;
     padding: .7em .5em;
     margin: 0;
     font-family: inherit;
@@ -84,7 +109,6 @@ select {
     line-height: inherit;
     z-index: 1;
     outline: none;
-    opacity: 0;
     transition: opacity 0.5s ease-in-out;
 }
 

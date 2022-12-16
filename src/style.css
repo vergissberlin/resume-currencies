@@ -35,6 +35,10 @@ body {
     color: #fff;
 }
 
+body::before {
+    display: none;;
+}
+
 h1, h2, h3 {
     font-weight: 200;
 }

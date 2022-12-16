@@ -30,7 +30,8 @@ To be useful, the following features need to be added:
 - [ ] On click on a label, open a modal with more information about the currency history
 - [ ] Add time slider to change the date of the currency data
 - [ ] Add a search bar to search for a currency by country name
-- [ ] Add a loading animation
+- [x] Add a loading screen
+- [ ] Add a loading indicator for  currency data
 - [ ] Add imprint
 
 ### Technical improvements
@@ -39,15 +40,16 @@ To be useful, the following features need to be added:
 - [x] Add types
 - [ ] CORS proxy settings
 - [ ] Add unit and e2e tests
-- [ ]  Add a 404 page
-- [ ]  Add error handling
-- [x]  CI/CD pipeline with github actions
-- [x]  Use github pages to host the project
+- [ ] Add a 404 page
+- [ ] Add error handling
+- [x] CI/CD pipeline with github actions
+- [x] Use github pages to host the project
 - [ ] Add a linter
 - [ ] Add a formatter
 - [ ] Add a commit message linter
 - [x] Reduce the size of the textures
 - [ ] Varnish Reverse Proxy for the API to hide the API key and to cache the data
+- [x] Add low resolution textures for mobile devices
 
 ## Development
 

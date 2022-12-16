@@ -39,6 +39,36 @@ let
     skybox
 
 let
+    textures = {
+        earth: {
+            map: 'images/earth-day-8k.jpg',
+            normal: 'images/earth-normal-2k.png',
+            specular: 'images/earth-specular-2k.jpg',
+            bump: 'images/earth-bump-2k.jpg',
+            clouds: 'images/earth-clouds-8k.jpg',
+        },
+        skybox: {
+            normal: 'images/skybox-milkyway-4k.jpg',
+        },
+    }
+
+// if touch device, use smaller textures
+if (window.matchMedia('(pointer: coarse)').matches) {
+    textures = {
+        earth: {
+            map: 'images/earth-day-2k.jpg',
+            normal: 'images/earth-normal-2k.png',
+            specular: 'images/earth-specular-2k.jpg',
+            bump: 'images/earth-bump-2k.jpg',
+            clouds: 'images/earth-clouds-2k.jpg',
+        },
+        skybox: {
+            normal: 'images/skybox-milkyway-2k.jpg',
+        },
+    }
+}
+
+let
     currencyBase = 'EUR',
     apiUrl = `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&currencies=${currencyList}&base_currency=${currencyBase}`
 
@@ -141,26 +171,28 @@ const init = (): void => {
 
     // Earth setup
     const earthGeometry = new THREE.SphereGeometry(1, 64, 64)
-    const earthTexture = textureLoader.load('images/earth-day.jpg')
+    const earthTexture = textureLoader.load(textures.earth.map)
     earthTexture.minFilter = THREE.NearestFilter
     earthTexture.magFilter = THREE.NearestFilter
     earthTexture.format = THREE.RGBAFormat
+
     const earthMaterial = new THREE.MeshPhongMaterial({
-        specular: 0x333333,
         shininess: 15,
-        map: earthTexture,
-        specularMap: textureLoader.load('images/earth-specular.jpg'),
-        normalMap: textureLoader.load('images/earth-normal.png'),
-        normalScale: new THREE.Vector2(2.85, 2.85),
-        bumpMap: textureLoader.load('images/earth-bump.jpg'),
+        map: textureLoader.load(textures.earth.map),
+        specularMap: textureLoader.load(textures.earth.specular),
+        specular: 0x333333,
+        bumpMap: textureLoader.load(textures.earth.bump),
         bumpScale: 1,
+        normalMap: textureLoader.load(textures.earth.normal),
+        normalScale: new THREE.Vector2(2.85, 2.85),
     })
+
     earth = new THREE.Mesh(earthGeometry, earthMaterial)
     earth.receiveShadow = true
     scene.add(earth)
 
     // Add clouds to earth
-    const cloudTexture = new THREE.TextureLoader().load('images/earth-clouds.jpg')
+    const cloudTexture = new THREE.TextureLoader().load(textures.earth.clouds)
     const cloudMaterial = new THREE.MeshStandardMaterial({ map: cloudTexture, transparent: true, opacity: 0.5, side: THREE.DoubleSide })
     const cloudGeometry = new THREE.SphereGeometry(1.015, 64, 64)
     clouds = new THREE.Mesh(cloudGeometry, cloudMaterial)
@@ -169,7 +201,7 @@ const init = (): void => {
 
     // Add skybox
     const skyboxGeometry = new THREE.SphereGeometry(12, 100, 100)
-    const skyboxTexture = new THREE.TextureLoader().load('images/skybox-milkyway.jpg')
+    const skyboxTexture = new THREE.TextureLoader().load(textures.skybox.normal)
     const skyboxMaterial = new THREE.MeshBasicMaterial({ map: skyboxTexture, side: THREE.BackSide })
     skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial)
     scene.add(skybox)

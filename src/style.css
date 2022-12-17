@@ -130,7 +130,7 @@ canvas {
 
 @media only screen and (max-width: 600px) {
     body {
-        font-size: 100%;
+        font-size: 90%;
     }
 
     .select, .factor {

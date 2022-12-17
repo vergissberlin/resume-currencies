@@ -3,20 +3,7 @@ import gsap from 'gsap'
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import './style.css'
-import { type } from 'os'
-
-type Textures = {
-    earth: {
-        map: string,
-        normal: string,
-        specular: string,
-        bump: string,
-        clouds: string,
-    },
-    skybox: {
-        normal: string,
-    },
-}
+import { Textures } from './types'
 
 const
     apiKey = 'MXOPiCmyl3TzlByq7DuKDkRHXW0bletn4VOxFibf',
@@ -336,10 +323,18 @@ const addEventListeners = (): void => {
  */
 const onControlsChange = (): void => {
     // Hide seletion when orbit controls distance is larger than 5
+    const labels = document.querySelectorAll('.label')
     if (controls.getDistance() > 4) {
         formDiv.style.opacity = '0'
+        // Set all labels to 0 opacity
+        labels.forEach(label => {
+            label.style.opacity = '0'
+        })
     } else {
         formDiv.style.opacity = '1'
+        labels.forEach(label => {
+            label.style.opacity = '1'
+        })
     }
 }
 

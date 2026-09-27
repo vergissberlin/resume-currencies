@@ -224,10 +224,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-three@^0.147.0:
-  version "0.147.0"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.147.0.tgz#1974af9e8e0c1efb3a8561334d57c0b6c29a7951"
-  integrity sha512-LPTOslYQXFkmvceQjFTNnVVli2LaVF6C99Pv34fJypp8NbQLbTlu3KinZ0zURghS5zEehK+VQyvWuPZ/Sm8fzw==
+three@^0.186.0:
+  version "0.186.1"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.186.1.tgz#6d50f70c2c437f844179bbb56d6f5b774e1ca38a"
+  integrity sha512-blFeqb49wRCSGUGj7gtpfnSGHy2lwDk94RhUmS1c/hTby70kvChbWpkJ4Pm1390LqzzvTmzgXKHPEafJwCb8jA==
 
 vite@^4.0.0:
   version "4.0.1"
